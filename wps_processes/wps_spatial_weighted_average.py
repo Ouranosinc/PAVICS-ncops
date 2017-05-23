@@ -91,7 +91,8 @@ class SpatialWeightedAverage(Process):
             wfs_server, typename, feature_ids=featureids)
         suffix = '_spatial_weighted_average.nc'
         out_file = os.path.basename(resource)[:-3] + suffix
-        out_file = os.path.join(netcdf_output_path, 'pavics-ncops', out_file)
+        out_file = os.path.join(
+            netcdf_output_path, 'netcdf_files/pavics-ncops', out_file)
         logger.error(out_file)
         ncgeo.spatial_weighted_average(resource, out_file, geometry)
 
