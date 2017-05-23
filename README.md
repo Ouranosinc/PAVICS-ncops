@@ -14,6 +14,11 @@ Running the application:
 
     docker run --name my_pavicsncops -d -p 8009:80 pavicsncops
 
+Accessing the application logs:
+
+    docker exec -it my_pavicsncops /bin/bash
+    >> cat /var/log/apache2/error.log
+
 The available processes can be obtained at:
 
     http://localhost:8009/pywps?service=WPS&request=GetCapabilities&version=1.0.0
