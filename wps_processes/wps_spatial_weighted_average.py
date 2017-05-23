@@ -68,7 +68,7 @@ class SpatialWeightedAverage(Process):
     def _handler(self, request, response):
         time_str = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         log_file_name = "log_file_%s_" % (time_str,)
-        log_file = os.path.join(netcdf_output_path, log_file_name)
+        log_file = os.path.join('/opt', log_file_name)
         logger = logging.getLogger(__name__)
         lf = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         dictConfig({'version': 1,
@@ -89,10 +89,9 @@ class SpatialWeightedAverage(Process):
         featureids = featureids.split(',')
         geometry = geoserver.shapely_from_geoserver(
             wfs_server, typename, feature_ids=featureids)
-        suffix = '_spatial_weighted_average.nc'
+        suffix = '_spatial_weighted_average_.nc'
         out_file = os.path.basename(resource)[:-3] + suffix
-        out_file = os.path.join(
-            netcdf_output_path, 'netcdf_files/pavics-ncops', out_file)
+        out_file = os.path.join('/opt', out_file)
         logger.error(out_file)
         ncgeo.spatial_weighted_average(resource, out_file, geometry)
 
