@@ -27,12 +27,11 @@ RUN cd /root && \
     cd /root/pyPavics && \
     python setup.py install && \
     rm -rf /root/pyPavics && \
-    mkdir /var/www/html/wps_results/netcdf_files && \
-    chown apapywps /var/www/html/wps_results/netcdf_files && \
-    chgrp apapywps /var/www/html/wps_results/netcdf_files && \
-    mkdir /var/www/html/wps_results/netcdf_files/pavics-ncops && \
-    chown apapywps /var/www/html/wps_results/netcdf_files/pavics-ncops && \
-    chgrp apapywps /var/www/html/wps_results/netcdf_files/pavics-ncops
+    chown apapywps /opt && \
+    chgrp apapywps /opt && \
+    mkdir /var/www/html/wps_results/pavics-ncops && \
+    chown apapywps /var/www/html/wps_results/pavics-ncops && \
+    chgrp apapywps /var/www/html/wps_results/pavics-ncops
 
 COPY pywps.wsgi /var/www/html/wps/
 COPY apache2.conf /etc/apache2/
@@ -43,7 +42,7 @@ COPY ncops.cfg /home/
 CMD export GEOSERVER_HOST=$(grep --only-matching --perl-regex "(?<=GEOSERVER_HOST\=).*" /home/ncops.cfg) && \
     export WPS_HOST=$(grep --only-matching --perl-regex "(?<=WPS_HOST\=).*" /home/ncops.cfg) && \
     printf "\nexport GEOSERVER_HOST=\"$GEOSERVER_HOST\"\n" >> /etc/apache2/envvars && \
-    sed -i '/outputurl=/c\outputurl=http://'"$WPS_HOST"'/wps_results/' /etc/pywps.cfg && \
+    sed -i '/outputurl=/c\outputurl=http://'"$WPS_HOST"'/wps_results/pavics-ncops/' /etc/pywps.cfg && \
     /etc/init.d/apache2 start && tail -f /dev/null
 
 EXPOSE 80
