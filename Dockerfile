@@ -27,9 +27,12 @@ RUN cd /root && \
     cd /root/pyPavics && \
     python setup.py install && \
     rm -rf /root/pyPavics && \
-    mkdir /var/www/html/wps_results/pavics-ncops && \
-    chown apapywps /var/www/html/wps_results/pavics-ncops && \
-    chgrp apapywps /var/www/html/wps_results/pavics-ncops
+    mkdir /var/www/html/wps_results/netcdf_files && \
+    chown apapywps /var/www/html/wps_results/netcdf_files && \
+    chgrp apapywps /var/www/html/wps_results/netcdf_files && \
+    mkdir /var/www/html/wps_results/netcdf_files/pavics-ncops && \
+    chown apapywps /var/www/html/wps_results/netcdf_files/pavics-ncops && \
+    chgrp apapywps /var/www/html/wps_results/netcdf_files/pavics-ncops
 
 COPY pywps.wsgi /var/www/html/wps/
 COPY apache2.conf /etc/apache2/
