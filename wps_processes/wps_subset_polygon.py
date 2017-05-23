@@ -11,7 +11,7 @@ from pavics import geoserver
 
 # Example usage:
 # http://localhost:8009/pywps?service=WPS&request=execute&version=1.0.0&\
-# identifier=spatial_weighted_average&storeExecuteResponse=true&status=true&\
+# identifier=subset_polygon&storeExecuteResponse=true&status=true&\
 # DataInputs=\
 # resource=http://x.x.x.x:8083/thredds/dodsC/birdhouse/ncep/cfsr/pr/\
 # pr_1hr_cfsr_reanalysis_197901.nc;\
@@ -28,7 +28,7 @@ json_format = get_format('JSON')
 netcdf_format = get_format('NETCDF')
 
 
-class SpatialWeightedAverage(Process):
+class SubsetPolygon(Process):
     def __init__(self):
         # From pywps4 code : time_format = '%Y-%m-%dT%H:%M:%S%z'
         # Is that a bug? %z should be %Z
@@ -54,10 +54,10 @@ class SpatialWeightedAverage(Process):
                                  supported_formats=[netcdf_format])]
         outputs[0].as_reference = True
 
-        super(SpatialWeightedAverage, self).__init__(
+        super(SubsetPolygon, self).__init__(
             self._handler,
-            identifier='spatial_weighted_average',
-            title='Spatial Weighted Average',
+            identifier='subset_polygon',
+            title='Subset polygon',
             abstract='Pending.',
             version='0.1',
             inputs=inputs,
@@ -89,10 +89,10 @@ class SpatialWeightedAverage(Process):
         featureids = featureids.split(',')
         geometry = geoserver.shapely_from_geoserver(
             wfs_server, typename, feature_ids=featureids)
-        suffix = '_spatial_weighted_average_.nc'
+        suffix = '_subset_polygon_.nc'
         out_file = os.path.basename(resource)[:-3] + suffix
         out_file = os.path.join('/opt', out_file)
-        ncgeo.spatial_weighted_average(resource, out_file, geometry)
+        ncgeo.subset_polygon(resource, out_file, geometry)
 
         response.outputs['output_netcdf'].file = out_file
         response.outputs['output_netcdf'].output_format = netcdf_format
