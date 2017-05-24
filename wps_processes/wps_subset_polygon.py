@@ -29,22 +29,26 @@ netcdf_format = get_format('NETCDF')
 
 
 class SubsetPolygon(Process):
+    """Return the subset of the netCDF file located inside a polygon.""""
     def __init__(self):
         # From pywps4 code : time_format = '%Y-%m-%dT%H:%M:%S%z'
         # Is that a bug? %z should be %Z
         # Using 'string' data_type until this is corrected.
         inputs = [LiteralInput('resource',
                                'Resource',
+                               'URL to netCDF file.',   
                                data_type='string',
                                min_occurs=0,
                                max_occurs=1),
                   LiteralInput('typename',
                                'TypeName',
+                               'The feature collection.',
                                data_type='string',
                                min_occurs=0,
                                max_occurs=1),
                   LiteralInput('featureids',
                                'Feature Ids',
+                               'The feature IDs', 
                                data_type='string',
                                min_occurs=0,
                                max_occurs=1)]
