@@ -6,7 +6,7 @@ RUN apt-get -yqq update && \
                          python-mpltoolkits.basemap python-pip apache2 \
                          libapache2-mod-wsgi python-setuptools python-lxml \
                          python-geojson python-future python-shapely \
-                         git-core && \
+                         git-core curl && \
     pip install threddsclient
 
 RUN cd /root && \

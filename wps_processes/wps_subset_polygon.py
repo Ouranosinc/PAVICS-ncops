@@ -143,7 +143,8 @@ class SubsetPolygon(Process):
             else:
                 # This is possibly a remote file, try to download it
                 nc_tmp = os.path.join('/tmp', os.path.basename(resource))
-                http_download(resource, nc_tmp)
+                #http_download(resource, nc_tmp)
+                os.system("curl {0} -o {1}".format(resource, nc_tmp))
                 try:
                     nc = netCDF4.Dataset(nc_tmp, 'r')
                     nc.close()
