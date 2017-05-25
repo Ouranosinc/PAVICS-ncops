@@ -24,15 +24,16 @@ wfs_server = wfs_server.format(env_geoserver_host)
 
 
 netcdf_output_path = configuration.get_config_value('server', 'outputpath')
+# In the context of the wps server running from docker, where the output
+# path comes from a docker volume, we may need to recreate this directory:
+if not os.path.isdir(netcdf_output_path):
+    os.makedirs(netcdf_output_path)
 json_format = get_format('JSON')
 netcdf_format = get_format('NETCDF')
 
 
 class SubsetPolygon(Process):
     def __init__(self):
-        # From pywps4 code : time_format = '%Y-%m-%dT%H:%M:%S%z'
-        # Is that a bug? %z should be %Z
-        # Using 'string' data_type until this is corrected.
         inputs = [LiteralInput('resource',
                                'Resource',
                                data_type='string',
