@@ -2,10 +2,16 @@ import os
 import time
 import logging
 from logging.config import dictConfig
+import http.client
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 from pywps import Process, get_format, configuration
 from pywps import LiteralInput, ComplexOutput
 
+import netCDF4
 from pavics import ncgeo
 from pavics import geoserver
 
@@ -30,6 +36,43 @@ if not os.path.isdir(netcdf_output_path):
     os.makedirs(netcdf_output_path)
 json_format = get_format('JSON')
 netcdf_format = get_format('NETCDF')
+
+
+# This should really be somewhere else...
+def conn_port_fix(conn_fn, netloc):
+    decode_netloc = netloc.split(':')
+    if len(decode_netloc) == 1:
+        return conn_fn(netloc)
+    else:
+        return conn_fn(decode_netloc[0], decode_netloc[-1])
+
+
+# This should really be somewhere else...
+def url_result(url):
+    parsed_url = urlparse(url)
+    if parsed_url.scheme == 'http':
+        conn = conn_port_fix(http.client.HTTPConnection, parsed_url.netloc)
+    elif parsed_url.scheme == 'https':
+        conn = conn_port_fix(http.client.HTTPSConnection, parsed_url.netloc)
+    reconstructed_url = parsed_url.path
+    if parsed_url.params:
+        reconstructed_url = reconstructed_url + ';' + parsed_url.params
+    if parsed_url.query:
+        reconstructed_url = reconstructed_url + '?' + parsed_url.query
+    if parsed_url.fragment:
+        reconstructed_url = reconstructed_url + '#' + parsed_url.fragment
+    conn.request("GET", reconstructed_url)
+    r1 = conn.getresponse()
+    url_response = r1.read()
+    conn.close()
+    return url_response
+
+
+# This should really be somewhere else...
+def http_download(url, target):
+    f1 = open(target, 'wb')
+    f1.write(url_result(url))
+    f1.close()
 
 
 class SpatialWeightedAverage(Process):
@@ -84,6 +127,32 @@ class SpatialWeightedAverage(Process):
                                      'propagate': True}}})
 
         resource = request.inputs['resource'][0].data
+        # If we get a link to a file, we need to download it since
+        # the ncgeo functions do not support downloading (yet?). There's
+        # also the case where an intermediate output from another process
+        # might already be on the thredds server through a docker volume
+        # in which case it would be more efficient to use its opendap url,
+        # but this is not returned by the process itself...
+        # Presently, let's just download files when necessary...
+        try:
+            nc = netCDF4.Dataset(resource, 'r')
+            nc.close()
+        except RuntimeError as e:
+            if e.message == 'NetCDF: Authorization failure':
+                raise NotImplementedError('Authentication required.')
+            elif e.message == 'NetCDF: file not found':
+                # This is possibly a remote file, try to download it
+                nc_tmp = os.path.join('/tmp', os.path.basename(resource))
+                http_download(resource, nc_tmp)
+                try:
+                    nc = netCDF4.Dataset(nc_tmp, 'r')
+                    nc.close()
+                except RuntimeError:
+                    raise IOError('Failed to download and open file.')
+                resource = nc_tmp
+            else:
+                raise IOError('Failed to open file.')
+
         typename = request.inputs['typename'][0].data
         featureids = request.inputs['featureids'][0].data
 
