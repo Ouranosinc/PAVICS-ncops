@@ -29,6 +29,8 @@ RUN cd /root && \
     rm -rf /root/pyPavics && \
     chown apapywps /opt && \
     chgrp apapywps /opt && \
+    chown apapywps /tmp && \
+    chgrp apapywps /tmp && \
     mkdir /var/www/html/wps_results/pavics-ncops && \
     chown apapywps /var/www/html/wps_results/pavics-ncops && \
     chgrp apapywps /var/www/html/wps_results/pavics-ncops
