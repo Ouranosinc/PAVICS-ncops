@@ -140,18 +140,16 @@ class SpatialWeightedAverage(Process):
         except RuntimeError as e:
             if e.message == 'NetCDF: Authorization failure':
                 raise NotImplementedError('Authentication required.')
-            elif e.message == 'NetCDF: file not found':
+            else:
                 # This is possibly a remote file, try to download it
                 nc_tmp = os.path.join('/tmp', os.path.basename(resource))
                 http_download(resource, nc_tmp)
                 try:
                     nc = netCDF4.Dataset(nc_tmp, 'r')
                     nc.close()
-                except RuntimeError:
+                except:
                     raise IOError('Failed to download and open file.')
                 resource = nc_tmp
-            else:
-                raise IOError('Failed to open file.')
 
         typename = request.inputs['typename'][0].data
         featureids = request.inputs['featureids'][0].data
