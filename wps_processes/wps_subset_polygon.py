@@ -76,19 +76,23 @@ def http_download(url, target):
 
 
 class SubsetPolygon(Process):
+    """Return the subset of the netCDF file located inside a polygon.""""
     def __init__(self):
         inputs = [LiteralInput('resource',
                                'Resource',
+                               'URL to netCDF file.',   
                                data_type='string',
                                min_occurs=0,
                                max_occurs=1),
                   LiteralInput('typename',
                                'TypeName',
+                               'The feature collection.',
                                data_type='string',
                                min_occurs=0,
                                max_occurs=1),
                   LiteralInput('featureids',
                                'Feature Ids',
+                               'The feature IDs', 
                                data_type='string',
                                min_occurs=0,
                                max_occurs=1)]
